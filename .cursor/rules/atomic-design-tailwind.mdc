@@ -1,0 +1,47 @@
+---
+description: 前台 UI 採原子設計，樣式使用 Tailwind CSS
+alwaysApply: true
+---
+
+# 原子設計 + Tailwind CSS
+
+前台 UI（`src/components`、`src/app/(site)`）必須遵循原子設計分層，樣式以 Tailwind utility 為主。
+
+## 目錄
+
+```
+src/components/
+  atoms/        ← 最小單元（按鈕、日期、載入點、動畫外殼）
+  molecules/    ← 由 atoms 組成（文章卡片、Navbar）
+  organisms/    ← 獨立區塊／資料區（列表、內文、SmoothScroll）
+```
+
+- `src/app/(site)` 只負責路由、資料邊界（`page` / `loading` / `layout`），UI 組裝優先呼叫 components。
+- Sanity schema、lib、Studio（`/studio`）不套用此分層。
+
+## 分層原則
+
+| 層級     | 可以                         | 不可以                     |
+| -------- | ---------------------------- | -------------------------- |
+| atom     | props、Tailwind、極少邏輯    | 抓 Sanity、組多個業務區塊  |
+| molecule | 組合 atoms                   | 直接 `client.fetch`        |
+| organism | 抓資料、組合 molecules/atoms | 把整頁 JSX 塞回 `page.tsx` |
+
+動畫／平滑捲動外殼（如 `FadeIn`、`SmoothScroll`）可當 atom／organism；**負責 fetch 的 page 不可加 `'use client'`**，以 children 傳入 Client Component。
+
+## Tailwind
+
+- 元件樣式用 Tailwind class；不新增 `tailwind.config.js`（v4 設定在 `globals.css` 的 `@theme`）。
+- 僅在無法用 utility 表達時（keyframes 等）才寫入 `globals.css`。
+- 避免 inline `style={{}}` 做一般排版；動態值才例外。
+
+## 匯入
+
+```tsx
+// ✅
+import DotLoading from '@/components/atoms/DotLoading';
+import PostCard from '@/components/molecules/PostCard';
+import PostsList from '@/components/organisms/PostsList';
+
+// ❌ 不要把新元件平鋪在 src/components/*.tsx
+```
