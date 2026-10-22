@@ -1,7 +1,7 @@
-import Image from 'next/image';
 import Link from 'next/link';
+import type { SanityImageSource } from '@sanity/image-url';
 import PostDate from '@/components/atoms/PostDate';
-import { urlFor } from '@/sanity/lib/image';
+import SanityImage from '@/components/atoms/SanityImage';
 
 type PostCardProps = {
   post: {
@@ -9,7 +9,7 @@ type PostCardProps = {
     slug: { current: string };
     publishedAt?: string;
     excerpt?: string;
-    mainImage?: unknown;
+    mainImage?: SanityImageSource;
   };
   priority?: boolean;
 };
@@ -18,14 +18,14 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
   return (
     <article>
       {post.mainImage ? (
-        <Image
-          src={urlFor(post.mainImage).width(1200).height(600).url()}
+        <SanityImage
+          value={post.mainImage}
           alt={post.title}
           width={1200}
           height={600}
-          className="mb-4 h-auto w-full rounded-lg"
+          className="mb-4 w-full rounded-lg"
           priority={priority}
-          loading={priority ? 'eager' : 'lazy'}
+          sizes="(max-width: 768px) 100vw, 720px"
         />
       ) : null}
       <h2 className="text-xl font-semibold">

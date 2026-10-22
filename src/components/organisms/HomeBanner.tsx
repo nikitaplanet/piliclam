@@ -1,6 +1,5 @@
-import Image from 'next/image';
+import SanityImage from '@/components/atoms/SanityImage';
 import { client } from '@/sanity/lib/client';
-import { urlFor } from '@/sanity/lib/image';
 import { HOME_PAGE_QUERY } from '@/sanity/lib/queries';
 
 const options = { next: { revalidate: 60 } };
@@ -20,13 +19,15 @@ export default async function HomeBanner() {
 
   return (
     <section className="relative w-full">
-      <Image
-        src={urlFor(home.banner).width(2400).height(1200).url()}
+      <SanityImage
+        value={home.banner}
         alt={alt}
         width={2400}
         height={1200}
-        className="h-[50vh] w-full object-cover md:h-[70vh]"
+        fill
         priority
+        className="h-[50vh] w-full md:h-[70vh]"
+        sizes="100vw"
       />
     </section>
   );
