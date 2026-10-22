@@ -2,7 +2,7 @@ import type { StructureResolver } from 'sanity/structure';
 
 const SINGLETONS = ['homePage'];
 
-export const structure: StructureResolver = S =>
+export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
     .items([
@@ -17,6 +17,6 @@ export const structure: StructureResolver = S =>
         ),
       S.divider(),
       ...S.documentTypeListItems().filter(
-        listItem => !SINGLETONS.includes(listItem.getId() as string),
+        (listItem) => !SINGLETONS.includes(listItem.getId() as string),
       ),
     ]);
