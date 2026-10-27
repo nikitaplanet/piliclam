@@ -18,6 +18,7 @@ type SanityImageProps = {
 	fill?: boolean;
 	/** CDN fit：max 保留比例不裁切；crop 依寬高裁切 */
 	fit?: 'max' | 'crop';
+	quality?: number;
 };
 
 export default function SanityImage({
@@ -31,18 +32,20 @@ export default function SanityImage({
 	sizes,
 	fill = false,
 	fit,
+	quality = 90,
 }: SanityImageProps) {
 	const [loaded, setLoaded] = useState(false);
 
 	if (!value) return null;
 
 	const resolvedFit = fit ?? (fill ? 'crop' : undefined);
+	const builder = urlFor(value).width(width).auto('format').quality(quality);
 	const src =
 		resolvedFit === 'max'
-			? urlFor(value).width(width).fit('max').url()
+			? builder.fit('max').url()
 			: resolvedFit === 'crop'
-				? urlFor(value).width(width).height(height).fit('crop').url()
-				: urlFor(value).width(width).height(height).url();
+				? builder.height(height).fit('crop').url()
+				: builder.height(height).url();
 
 	return (
 		<span className={`relative block overflow-hidden ${className}`}>
@@ -53,6 +56,7 @@ export default function SanityImage({
 				{...(fill ? {fill: true as const, sizes: sizes ?? '100vw'} : {width, height, sizes})}
 				priority={priority}
 				loading={priority ? 'eager' : 'lazy'}
+				quality={quality}
 				className={`transition-opacity duration-500 ease-out ${loaded ? 'opacity-100' : 'opacity-0'} ${
 					fill ? 'object-cover' : 'h-auto w-full'
 				} ${imgClassName}`}

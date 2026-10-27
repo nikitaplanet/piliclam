@@ -22,11 +22,12 @@ export default function PostCard({post, priority = false}: PostCardProps) {
 					<SanityImage
 						value={post.mainImage}
 						alt={post.title}
-						width={1200}
-						height={600}
+						width={2000}
+						height={1000}
+						fit="max"
 						className="mb-4 w-full"
 						priority={priority}
-						sizes="(max-width: 768px) 100vw, 720px"
+						sizes="(max-width: 1000px) 100vw, 1000px"
 					/>
 				) : null}
 				<h2 className="text-xl font-semibold group-hover:underline">{post.title}</h2>

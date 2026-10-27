@@ -1,7 +1,7 @@
 import {notFound} from 'next/navigation';
 import {PortableText, type PortableTextComponents} from 'next-sanity';
 import PostDate from '@/components/atoms/PostDate';
-import SanityImage from '@/components/atoms/SanityImage';
+import LightboxImage from '@/components/molecules/LightboxImage';
 import {client} from '@/sanity/lib/client';
 import {POST_QUERY} from '@/sanity/lib/queries';
 import type {SanityImageSource} from '@sanity/image-url';
@@ -11,13 +11,12 @@ const options = {next: {revalidate: 60}};
 const components: PortableTextComponents = {
 	types: {
 		image: ({value}) => (
-			<SanityImage
+			<LightboxImage
 				value={value as SanityImageSource}
 				alt={value.alt || ''}
-				width={800}
-				height={450}
-				className="w-full"
-				sizes="(max-width: 768px) 100vw, 800px"
+				width={2000}
+				height={1125}
+				sizes="(max-width: 1000px) 100vw, 1000px"
 			/>
 		),
 	},
@@ -30,16 +29,16 @@ export default async function PostContent({slug}: {slug: string}) {
 	return (
 		<article>
 			<h1 className="mb-2 text-3xl font-bold">{post.title}</h1>
-			{post.publishedAt ? <PostDate value={post.publishedAt} /> : null}
+			{post.publishedAt ? <PostDate value={post.publishedAt} className="text-lg text-gray-500" /> : null}
 			{post.mainImage ? (
-				<SanityImage
+				<LightboxImage
 					value={post.mainImage as SanityImageSource}
 					alt=""
-					width={1200}
-					height={600}
-					className="my-8 w-full"
+					width={2000}
+					height={1000}
+					className="my-8"
 					priority
-					sizes="(max-width: 768px) 100vw, 800px"
+					sizes="(max-width: 1000px) 100vw, 1000px"
 				/>
 			) : null}
 			<div className="prose max-w-none">

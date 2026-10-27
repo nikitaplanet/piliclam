@@ -8,4 +8,23 @@ export const POSTS_QUERY = defineQuery(`*[_type == "post" && defined(slug.curren
   _id, title, slug, publishedAt, excerpt, mainImage
 }`);
 
-export const POST_QUERY = defineQuery(`*[_type == "post" && slug.current == $slug][0]`);
+const imageWithExif = /* groq */ `{
+  ...,
+  asset->{
+    _id,
+    url,
+    metadata {
+      exif,
+      image
+    }
+  }
+}`;
+
+export const POST_QUERY = defineQuery(`*[_type == "post" && slug.current == $slug][0]{
+  ...,
+  mainImage ${imageWithExif},
+  body[]{
+    ...,
+    _type == "image" => ${imageWithExif}
+  }
+}`);

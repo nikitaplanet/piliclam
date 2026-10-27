@@ -1,5 +1,10 @@
 import {defineField, defineType} from 'sanity';
 
+const imageMetadataOptions = {
+	hotspot: true,
+	metadata: ['exif', 'image', 'lqip', 'palette', 'blurhash'] as const,
+};
+
 export const postType = defineType({
 	name: 'post',
 	title: '文章',
@@ -27,7 +32,14 @@ export const postType = defineType({
 			name: 'mainImage',
 			title: '封面圖',
 			type: 'image',
-			options: {hotspot: true},
+			options: {...imageMetadataOptions},
+			fields: [
+				defineField({
+					name: 'alt',
+					title: '替代文字',
+					type: 'string',
+				}),
+			],
 		}),
 		defineField({
 			name: 'excerpt',
@@ -39,7 +51,20 @@ export const postType = defineType({
 			name: 'body',
 			title: '內文',
 			type: 'array',
-			of: [{type: 'block'}, {type: 'image'}],
+			of: [
+				{type: 'block'},
+				{
+					type: 'image',
+					options: {...imageMetadataOptions},
+					fields: [
+						defineField({
+							name: 'alt',
+							title: '替代文字',
+							type: 'string',
+						}),
+					],
+				},
+			],
 		}),
 	],
 });
