@@ -1,8 +1,8 @@
-import {defineField, defineType} from 'sanity';
+import {defineField, defineType, type ImageMetadataType} from 'sanity';
 
 const imageMetadataOptions = {
 	hotspot: true,
-	metadata: ['exif', 'image', 'lqip', 'palette', 'blurhash'] as const,
+	metadata: ['exif', 'image', 'lqip', 'palette', 'blurhash'] satisfies ImageMetadataType[],
 };
 
 export const postType = defineType({
