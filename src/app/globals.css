@@ -43,6 +43,14 @@
 body {
 	background: var(--background);
 	color: var(--foreground);
+	font-size: 14px;
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* 前台移除瀏覽器預設藍色 focus ring */
+:where(a, button, summary, input, textarea, select, [tabindex]:not([tabindex='-1'])):focus,
+:where(a, button, summary, input, textarea, select, [tabindex]:not([tabindex='-1'])):focus-visible {
+	outline: none;
 }
 
 /* 全站象牙底微粒噪點 */

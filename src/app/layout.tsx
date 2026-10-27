@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: LayoutProps<'/'>) {
 	return (
 		<html lang="zh-Hant-TW" className={`${cormorantGaramond.variable} ${spaceGrotesk.variable} ${notoSansTC.variable} h-full antialiased`}>
-			<body className="flex min-h-full flex-col font-sans">{children}</body>
+			<body className="flex min-h-full flex-col font-sans font-medium">{children}</body>
 		</html>
 	);
 }
