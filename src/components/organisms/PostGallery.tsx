@@ -19,7 +19,7 @@ type PostGalleryProps = {
 };
 
 function gallerySrc(image: GalleryImage) {
-	return urlFor(image.value).width(2400).fit('max').auto('format').quality(90).url();
+	return urlFor(image.value).width(2400).fit('max').auto('format').quality(95).url();
 }
 
 export default function PostGallery({images, children}: PostGalleryProps) {
@@ -234,7 +234,7 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 											alt={current.alt}
 											width={2400}
 											height={2400}
-											quality={90}
+											quality={95}
 											draggable={false}
 											className={`max-h-[min(90dvh,calc(90dvh-5rem))] w-auto max-w-full object-contain ${
 												imageLoaded ? 'opacity-100' : 'absolute opacity-0'
@@ -268,7 +268,7 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 										alt=""
 										width={2400}
 										height={2400}
-										quality={90}
+										quality={95}
 										className="pointer-events-none absolute h-0 w-0 opacity-0"
 										aria-hidden
 									/>

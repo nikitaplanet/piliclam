@@ -86,13 +86,23 @@ export default function LightboxImage({
 
 	if (!value) return null;
 
-	const lightboxSrc = urlFor(value).width(2400).fit('max').auto('format').quality(90).url();
+	const lightboxSrc = urlFor(value).width(2400).fit('max').auto('format').quality(95).url();
 	const photoExif = formatPhotoExif(value);
 
 	return (
 		<>
 			<button type="button" aria-label="放大圖片" className={`block w-full cursor-pointer text-left ${className}`} onClick={open}>
-				<SanityImage value={value} alt={alt} width={width} height={height} fit="max" priority={priority} sizes={sizes} className="w-full" />
+				<SanityImage
+					value={value}
+					alt={alt}
+					width={width}
+					height={height}
+					fit="max"
+					priority={priority}
+					sizes={sizes}
+					className="w-full"
+					quality={95}
+				/>
 			</button>
 
 			{/* 無 PostGallery 時的單圖後備 */}
@@ -125,7 +135,7 @@ export default function LightboxImage({
 										alt={alt}
 										width={2400}
 										height={2400}
-										quality={90}
+										quality={95}
 										loading="lazy"
 										className={`max-h-[min(90dvh,calc(90dvh-3rem))] w-auto max-w-full object-contain transition-opacity duration-500 ease-out ${
 											imageLoaded ? 'opacity-100' : 'absolute opacity-0'
