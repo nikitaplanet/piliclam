@@ -16,7 +16,7 @@ const components: PortableTextComponents = {
 				alt={value.alt || ''}
 				width={800}
 				height={450}
-				className="w-full rounded-lg"
+				className="w-full"
 				sizes="(max-width: 768px) 100vw, 800px"
 			/>
 		),
@@ -37,7 +37,7 @@ export default async function PostContent({slug}: {slug: string}) {
 					alt=""
 					width={1200}
 					height={600}
-					className="my-8 w-full rounded-lg"
+					className="my-8 w-full"
 					priority
 					sizes="(max-width: 768px) 100vw, 800px"
 				/>

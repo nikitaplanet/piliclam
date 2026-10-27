@@ -24,7 +24,7 @@ export default function PostCard({post, priority = false}: PostCardProps) {
 						alt={post.title}
 						width={1200}
 						height={600}
-						className="mb-4 w-full rounded-lg"
+						className="mb-4 w-full"
 						priority={priority}
 						sizes="(max-width: 768px) 100vw, 720px"
 					/>

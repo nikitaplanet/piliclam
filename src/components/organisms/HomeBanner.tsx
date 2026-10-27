@@ -9,7 +9,7 @@ export default async function HomeBanner() {
 
 	if (!home?.banner) {
 		return (
-			<div className="flex min-h-[50vh] items-center justify-center bg-gray-100 px-5 text-sm text-gray-500 md:px-10">
+			<div className="flex h-[calc(100dvh-3.5rem-50px)] w-full items-center justify-center bg-background px-5 text-sm text-gray-500 md:px-10">
 				請至 Studio「首頁」上傳 Banner／封面圖
 			</div>
 		);
@@ -18,17 +18,20 @@ export default async function HomeBanner() {
 	const alt = home.banner.alt || 'piliclam';
 
 	return (
-		<section className="relative w-full">
-			<SanityImage
-				value={home.banner}
-				alt={alt}
-				width={2400}
-				height={1200}
-				fill
-				priority
-				className="h-[50vh] w-full md:h-[70vh]"
-				sizes="100vw"
-			/>
+		<section className="flex h-[calc(100dvh-3.5rem-50px)] w-full items-center justify-center overflow-hidden bg-background px-5">
+			<div className="relative top-[-50px] w-full max-w-[1000px]">
+				<SanityImage
+					value={home.banner}
+					alt={alt}
+					width={2000}
+					height={2000}
+					fit="max"
+					priority
+					className="min-h-0 max-h-full w-full"
+					imgClassName="max-h-[calc(100dvh-3.5rem-50px)] object-contain"
+					sizes="(max-width: 1000px) 100vw, 1000px"
+				/>
+			</div>
 		</section>
 	);
 }
