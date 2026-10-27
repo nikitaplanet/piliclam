@@ -1,4 +1,4 @@
-import {buildLegacyTheme, defaultTheme} from 'sanity';
+import {buildLegacyTheme, defaultTheme, type StudioTheme} from 'sanity';
 import {brandColors} from '@/theme/brand';
 
 const {foreground, primary} = brandColors;
@@ -53,14 +53,19 @@ function withFocusRingColor<T>(value: T, focusColor: string): T {
 	return value;
 }
 
-export const studioTheme = {
+const defaultV2 = defaultTheme.v2;
+
+export const studioTheme: StudioTheme = {
 	...defaultTheme,
 	...legacyTheme,
 	color: withFocusRingColor(legacyTheme.color ?? defaultTheme.color, foreground),
 	container: [...CONTAINERS],
-	v2: {
-		...defaultTheme.v2,
-		container: [...CONTAINERS],
-		color: withFocusRingColor(defaultTheme.v2.color, foreground),
-	},
+	v2: defaultV2
+		? {
+				...defaultV2,
+				_version: 2,
+				container: [...CONTAINERS],
+				color: withFocusRingColor(defaultV2.color, foreground),
+			}
+		: undefined,
 };
