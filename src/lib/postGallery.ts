@@ -1,4 +1,5 @@
 import type {ImageMetadataSource} from '@/lib/formatPhotoExif';
+import {hasImageAsset} from '@/sanity/lib/image';
 import type {SanityImageSource} from '@sanity/image-url';
 
 export type GalleryImage = {
@@ -18,12 +19,12 @@ export function collectPostGalleryImages(post: {
 }): GalleryImage[] {
 	const items: GalleryImage[] = [];
 
-	if (post.mainImage) {
-		items.push({value: post.mainImage, alt: ''});
+	if (hasImageAsset(post.mainImage)) {
+		items.push({value: post.mainImage as SanityImageSource & ImageMetadataSource, alt: ''});
 	}
 
 	for (const block of post.body ?? []) {
-		if (block?._type === 'image') {
+		if (block?._type === 'image' && hasImageAsset(block)) {
 			items.push({value: block, alt: block.alt || ''});
 		}
 	}

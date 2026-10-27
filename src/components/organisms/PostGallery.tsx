@@ -3,14 +3,17 @@
 import {useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode} from 'react';
 import {createPortal} from 'react-dom';
 import Image from 'next/image';
-import ImageSkeleton from '@/components/atoms/ImageSkeleton';
+import BarLoading from '@/components/atoms/BarLoading';
 import {PostGalleryContext} from '@/components/molecules/PostGalleryContext';
 import {formatPhotoExif} from '@/lib/formatPhotoExif';
 import type {GalleryImage} from '@/lib/postGallery';
-import {urlFor} from '@/sanity/lib/image';
+import {hasImageAsset, urlFor} from '@/sanity/lib/image';
 
 const FADE_MS = 300;
 const SLIDE_FADE_MS = 360;
+/** 首次開啟 lightbox 至少顯示一輪長條 shimmer */
+const LOADER_CYCLE_MS = 1500;
+const LOADER_SLIDE_MS = 160;
 const SWIPE_THRESHOLD_PX = 48;
 
 type PostGalleryProps = {
@@ -19,6 +22,7 @@ type PostGalleryProps = {
 };
 
 function gallerySrc(image: GalleryImage) {
+	if (!hasImageAsset(image.value)) return '';
 	return urlFor(image.value).width(2400).fit('max').auto('format').quality(95).url();
 }
 
@@ -29,15 +33,23 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 	const [index, setIndex] = useState(0);
 	const [imageLoaded, setImageLoaded] = useState(false);
 	const [slideVisible, setSlideVisible] = useState(false);
+	/** 僅首次開啟顯示長條 loading；左右切換不顯示 */
+	const [showBarLoader, setShowBarLoader] = useState(false);
 	const pointerStart = useRef<{x: number; y: number; id: number} | null>(null);
 	const indexRef = useRef(index);
 	const transitioning = useRef(false);
 	const slideTimer = useRef<number | null>(null);
+	const openedAt = useRef(0);
+	const revealTimer = useRef<number | null>(null);
+	const imageReady = useRef(false);
+	/** 本次開啟是否要播滿一輪長條 loading */
+	const useFullLoader = useRef(true);
 
 	useEffect(() => {
 		setMounted(true);
 		return () => {
 			if (slideTimer.current != null) window.clearTimeout(slideTimer.current);
+			if (revealTimer.current != null) window.clearTimeout(revealTimer.current);
 		};
 	}, []);
 
@@ -48,20 +60,51 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 	const close = useCallback(() => {
 		setVisible(false);
 		setSlideVisible(false);
+		if (revealTimer.current != null) window.clearTimeout(revealTimer.current);
 		window.setTimeout(() => {
 			setPresent(false);
 			setImageLoaded(false);
+			setShowBarLoader(false);
+			imageReady.current = false;
 			transitioning.current = false;
 		}, FADE_MS);
 	}, []);
+
+	const scheduleReveal = useCallback(() => {
+		if (!imageReady.current) return;
+		const minMs = useFullLoader.current ? LOADER_CYCLE_MS : LOADER_SLIDE_MS;
+		const wait = Math.max(0, minMs - (Date.now() - openedAt.current));
+		if (revealTimer.current != null) window.clearTimeout(revealTimer.current);
+		revealTimer.current = window.setTimeout(() => {
+			useFullLoader.current = false;
+			setShowBarLoader(false);
+			setImageLoaded(true);
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					setSlideVisible(true);
+					transitioning.current = false;
+				});
+			});
+		}, wait);
+	}, []);
+
+	const onImageReady = useCallback(() => {
+		imageReady.current = true;
+		scheduleReveal();
+	}, [scheduleReveal]);
 
 	const openAt = useCallback(
 		(nextIndex: number) => {
 			if (images.length === 0) return;
 			if (slideTimer.current != null) window.clearTimeout(slideTimer.current);
+			if (revealTimer.current != null) window.clearTimeout(revealTimer.current);
 			transitioning.current = false;
+			useFullLoader.current = true;
+			openedAt.current = Date.now();
+			imageReady.current = false;
 			setIndex(Math.max(0, Math.min(nextIndex, images.length - 1)));
 			setImageLoaded(false);
+			setShowBarLoader(true);
 			setSlideVisible(false);
 			setPresent(true);
 			requestAnimationFrame(() => {
@@ -79,9 +122,14 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 
 			transitioning.current = true;
 			setSlideVisible(false);
+			setShowBarLoader(false);
 
 			if (slideTimer.current != null) window.clearTimeout(slideTimer.current);
+			if (revealTimer.current != null) window.clearTimeout(revealTimer.current);
 			slideTimer.current = window.setTimeout(() => {
+				useFullLoader.current = false;
+				openedAt.current = Date.now();
+				imageReady.current = false;
 				setImageLoaded(false);
 				setIndex(wrapped);
 			}, SLIDE_FADE_MS);
@@ -95,16 +143,6 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 		},
 		[goTo],
 	);
-
-	const revealSlide = useCallback(() => {
-		setImageLoaded(true);
-		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
-				setSlideVisible(true);
-				transitioning.current = false;
-			});
-		});
-	}, []);
 
 	useEffect(() => {
 		if (!present) return;
@@ -213,8 +251,10 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 								</button>
 							) : null}
 
+							{showBarLoader ? <BarLoading className="absolute inset-0 z-[1]" /> : null}
 							<div
-								className="flex max-h-[90dvh] w-full max-w-full touch-pan-y flex-col items-center gap-4 select-none"
+								className="relative z-[2] flex max-h-[90dvh] w-full max-w-full touch-pan-y flex-col items-center gap-4 select-none"
+								aria-hidden={!imageLoaded}
 								onClick={(event) => event.stopPropagation()}>
 								<div
 									className="flex max-h-[min(90dvh,calc(90dvh-5rem))] w-full max-w-full flex-col items-center gap-4 transition-opacity ease-out"
@@ -223,11 +263,7 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 										transitionDuration: `${SLIDE_FADE_MS}ms`,
 									}}>
 									<span className="relative flex max-h-[min(90dvh,calc(90dvh-5rem))] max-w-full items-center justify-center">
-										{!imageLoaded ? (
-											<span className="relative block h-[50vh] w-[min(90vw,800px)] overflow-hidden opacity-40">
-												<ImageSkeleton />
-											</span>
-										) : null}
+										{/* 背景先載圖，首次開啟等飛碟播完一輪再淡入 */}
 										<Image
 											key={lightboxSrc}
 											src={lightboxSrc}
@@ -235,12 +271,11 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 											width={2400}
 											height={2400}
 											quality={95}
+											priority
 											draggable={false}
-											className={`max-h-[min(90dvh,calc(90dvh-5rem))] w-auto max-w-full object-contain ${
-												imageLoaded ? 'opacity-100' : 'absolute opacity-0'
-											}`}
-											onLoad={revealSlide}
-											onError={revealSlide}
+											className="max-h-[min(90dvh,calc(90dvh-5rem))] w-auto max-w-full object-contain"
+											onLoad={onImageReady}
+											onError={onImageReady}
 										/>
 									</span>
 									{photoExif ? <p className="max-w-[90vw] text-center font-grotesk text-sm text-paper/70">{photoExif}</p> : null}

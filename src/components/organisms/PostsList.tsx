@@ -1,4 +1,3 @@
-import FadeIn from '@/components/atoms/FadeIn';
 import PostCard from '@/components/molecules/PostCard';
 import {client} from '@/sanity/lib/client';
 import {POSTS_QUERY} from '@/sanity/lib/queries';
@@ -15,9 +14,7 @@ export default async function PostsList() {
 	return (
 		<main className="space-y-20">
 			{posts.map((post: any, index: number) => (
-				<FadeIn key={post._id}>
-					<PostCard post={post} priority={index === 0} />
-				</FadeIn>
+				<PostCard key={post._id} post={post} priority={index === 0} />
 			))}
 		</main>
 	);

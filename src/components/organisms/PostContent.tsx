@@ -1,10 +1,12 @@
 import {notFound} from 'next/navigation';
 import {PortableText, type PortableTextComponents} from 'next-sanity';
+import BackLink from '@/components/atoms/BackLink';
 import PostDate from '@/components/atoms/PostDate';
 import LightboxImage from '@/components/molecules/LightboxImage';
 import PostGallery from '@/components/organisms/PostGallery';
 import {collectPostGalleryImages, findGalleryIndex} from '@/lib/postGallery';
 import {client} from '@/sanity/lib/client';
+import {hasImageAsset} from '@/sanity/lib/image';
 import {POST_QUERY} from '@/sanity/lib/queries';
 import type {SanityImageSource} from '@sanity/image-url';
 import type {ImageMetadataSource} from '@/lib/formatPhotoExif';
@@ -21,6 +23,7 @@ export default async function PostContent({slug}: {slug: string}) {
 		types: {
 			image: ({value}) => {
 				const source = value as SanityImageSource & ImageMetadataSource;
+				if (!hasImageAsset(source)) return null;
 				const galleryIndex = findGalleryIndex(images, source);
 				return (
 					<LightboxImage
@@ -39,9 +42,10 @@ export default async function PostContent({slug}: {slug: string}) {
 	return (
 		<PostGallery images={images}>
 			<article>
+				<BackLink className="mb-6" />
 				<h1 className="mb-2 text-3xl font-bold">{post.title}</h1>
 				{post.publishedAt ? <PostDate value={post.publishedAt} className="text-lg text-gray-500" /> : null}
-				{post.mainImage ? (
+				{hasImageAsset(post.mainImage) ? (
 					<LightboxImage
 						value={post.mainImage as SanityImageSource & ImageMetadataSource}
 						alt=""

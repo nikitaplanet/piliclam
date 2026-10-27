@@ -1,9 +1,9 @@
 'use client';
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Image from 'next/image';
 import ImageSkeleton from '@/components/atoms/ImageSkeleton';
-import {urlFor} from '@/sanity/lib/image';
+import {hasImageAsset, urlFor} from '@/sanity/lib/image';
 import type {SanityImageSource} from '@sanity/image-url';
 
 type SanityImageProps = {
@@ -34,32 +34,45 @@ export default function SanityImage({
 	fit,
 	quality = 90,
 }: SanityImageProps) {
-	const [loaded, setLoaded] = useState(false);
-
-	if (!value) return null;
-
+	const valid = hasImageAsset(value);
 	const resolvedFit = fit ?? (fill ? 'crop' : undefined);
-	const builder = urlFor(value).width(width).auto('format').quality(quality);
-	const src =
-		resolvedFit === 'max'
-			? builder.fit('max').url()
-			: resolvedFit === 'crop'
-				? builder.height(height).fit('crop').url()
-				: builder.height(height).url();
+	const src = valid
+		? (() => {
+				const builder = urlFor(value).width(width).auto('format').quality(quality);
+				return resolvedFit === 'max'
+					? builder.fit('max').url()
+					: resolvedFit === 'crop'
+						? builder.height(height).fit('crop').url()
+						: builder.height(height).url();
+			})()
+		: '';
+
+	const [loaded, setLoaded] = useState(false);
+	const [imgEl, setImgEl] = useState<HTMLImageElement | null>(null);
+
+	useEffect(() => {
+		setLoaded(false);
+	}, [src]);
+
+	// 快取圖掛載時 complete 已是 true，直接顯示避免換頁後再閃
+	useEffect(() => {
+		if (imgEl?.complete && imgEl.naturalWidth > 0) setLoaded(true);
+	}, [imgEl, src]);
+
+	if (!valid || !src) return null;
 
 	return (
-		<span className={`print-paper-frame relative block ${className}`}>
+		<span className={`relative block ${className}`}>
 			{!loaded ? <ImageSkeleton /> : null}
 			<Image
+				ref={setImgEl}
 				src={src}
 				alt={alt}
 				{...(fill ? {fill: true as const, sizes: sizes ?? '100vw'} : {width, height, sizes})}
 				priority={priority}
 				loading={priority ? 'eager' : 'lazy'}
 				quality={quality}
-				className={`transition-opacity duration-500 ease-out ${loaded ? 'opacity-100' : 'opacity-0'} ${
-					fill ? 'object-cover' : 'h-auto w-full'
-				} ${imgClassName}`}
+				className={`relative ${fill ? 'object-cover' : 'h-auto w-full'} ${imgClassName}`}
 				onLoad={() => setLoaded(true)}
 				onError={() => setLoaded(true)}
 			/>

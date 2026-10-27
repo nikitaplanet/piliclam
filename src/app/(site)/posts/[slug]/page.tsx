@@ -1,10 +1,9 @@
 import type {Metadata} from 'next';
-import {Suspense} from 'react';
 import ContentShell from '@/components/atoms/ContentShell';
-import DotLoading from '@/components/atoms/DotLoading';
+import PageFadeIn from '@/components/atoms/PageFadeIn';
 import PostContent from '@/components/organisms/PostContent';
 import {client} from '@/sanity/lib/client';
-import {urlFor} from '@/sanity/lib/image';
+import {hasImageAsset, urlFor} from '@/sanity/lib/image';
 import {POST_QUERY} from '@/sanity/lib/queries';
 
 const options = {next: {revalidate: 60}};
@@ -21,22 +20,20 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
 		openGraph: {
 			title: post.title,
 			description: post.excerpt,
-			images: post.mainImage ? [urlFor(post.mainImage).width(1200).height(630).auto('format').quality(90).url()] : [],
+			images: hasImageAsset(post.mainImage)
+				? [urlFor(post.mainImage).width(1200).height(630).auto('format').quality(90).url()]
+				: [],
 		},
 	};
 }
 
-async function PostPageBody({params}: Props) {
+export default async function PostPage({params}: Props) {
 	const {slug} = await params;
-	return <PostContent slug={slug} />;
-}
-
-export default function PostPage({params}: Props) {
 	return (
-		<ContentShell>
-			<Suspense fallback={<DotLoading />}>
-				<PostPageBody params={params} />
-			</Suspense>
-		</ContentShell>
+		<PageFadeIn>
+			<ContentShell>
+				<PostContent slug={slug} />
+			</ContentShell>
+		</PageFadeIn>
 	);
 }

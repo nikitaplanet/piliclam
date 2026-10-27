@@ -12,14 +12,22 @@ export default function FadeIn({children}: {children: ReactNode}) {
 
 	useGSAP(
 		() => {
+			const el = ref.current;
+			if (!el) return;
+
 			const mm = gsap.matchMedia();
 			mm.add('(prefers-reduced-motion: no-preference)', () => {
-				gsap.from(ref.current, {
+				// 已在視窗內（剛換頁淡入）就不要再從 opacity 0 播一次，否則會閃兩下
+				const rect = el.getBoundingClientRect();
+				const alreadyInView = rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
+				if (alreadyInView) return;
+
+				gsap.from(el, {
 					y: 40,
 					opacity: 0,
 					duration: 0.8,
 					ease: 'power2.out',
-					scrollTrigger: {trigger: ref.current, start: 'top 85%'},
+					scrollTrigger: {trigger: el, start: 'top 85%', once: true},
 				});
 			});
 		},

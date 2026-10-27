@@ -1,11 +1,10 @@
-import {Suspense} from 'react';
-import DotLoading from '@/components/atoms/DotLoading';
+import PageFadeIn from '@/components/atoms/PageFadeIn';
 import HomeBanner from '@/components/organisms/HomeBanner';
 
 export default function HomePage() {
 	return (
-		<Suspense fallback={<DotLoading />}>
+		<PageFadeIn>
 			<HomeBanner />
-		</Suspense>
+		</PageFadeIn>
 	);
 }
