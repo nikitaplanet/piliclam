@@ -1,0 +1,24 @@
+/* Sanity Studio：可點元素一律顯示 pointer */
+button,
+[type='button'],
+[type='submit'],
+[type='reset'],
+[role='button'],
+[data-ui='Button'],
+[data-as='button'],
+summary,
+label[for],
+a[href],
+[data-ui='MenuButton'],
+[data-ui='Tab'],
+[data-ui='Switch'],
+[data-ui='Checkbox'],
+[data-ui='Radio'] {
+	cursor: pointer !important;
+}
+
+button:disabled,
+[aria-disabled='true'],
+[data-disabled] {
+	cursor: not-allowed !important;
+}

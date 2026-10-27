@@ -48,7 +48,7 @@ export default function SanityImage({
 				: builder.height(height).url();
 
 	return (
-		<span className={`relative block overflow-hidden ${className}`}>
+		<span className={`print-paper-frame relative block ${className}`}>
 			{!loaded ? <ImageSkeleton /> : null}
 			<Image
 				src={src}

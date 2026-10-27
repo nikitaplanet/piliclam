@@ -3,8 +3,7 @@ export default function SiteFooter() {
 
 	return (
 		<footer className="px-5 py-6 md:px-10">
-			<p className="text-center text-base text-gray-400">© {year} nikita @piliclam.</p>
-
+			<p className="text-center text-base text-gray-500">© {year} nikita @piliclam</p>
 		</footer>
 	);
 }

@@ -13,7 +13,9 @@ export default function ContactPage() {
 						I typically reply within 1–2 business days.
 						<br /> Looking forward to connecting.
 					</p>
-					<Image src="/contact.jpg" alt="Contact" width={400} height={267} className="h-auto w-full max-w-[400px]" sizes="400px" priority />
+					<div className="print-paper-frame w-full max-w-[400px]">
+						<Image src="/contact.jpg" alt="Contact" width={400} height={267} className="h-auto w-full" sizes="400px" priority />
+					</div>
 				</div>
 			</main>
 		</ContentShell>

@@ -1,4 +1,5 @@
 import {defineField, defineType, type ImageMetadataType} from 'sanity';
+import {WidePortableTextInput} from '../components/WidePortableTextInput';
 
 const imageMetadataOptions = {
 	hotspot: true,
@@ -51,6 +52,9 @@ export const postType = defineType({
 			name: 'body',
 			title: '內文',
 			type: 'array',
+			components: {
+				input: WidePortableTextInput,
+			},
 			of: [
 				{type: 'block'},
 				{

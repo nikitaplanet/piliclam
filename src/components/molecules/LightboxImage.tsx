@@ -5,7 +5,9 @@ import {createPortal} from 'react-dom';
 import Image from 'next/image';
 import ImageSkeleton from '@/components/atoms/ImageSkeleton';
 import SanityImage from '@/components/atoms/SanityImage';
+import {usePostGallery} from '@/components/molecules/PostGalleryContext';
 import {formatPhotoExif, type ImageMetadataSource} from '@/lib/formatPhotoExif';
+import {findGalleryIndex} from '@/lib/postGallery';
 import {urlFor} from '@/sanity/lib/image';
 import type {SanityImageSource} from '@sanity/image-url';
 
@@ -19,9 +21,21 @@ type LightboxImageProps = {
 	className?: string;
 	priority?: boolean;
 	sizes?: string;
+	/** 在 PostGallery 內開啟時的索引；未傳則依 asset 自動對應 */
+	galleryIndex?: number;
 };
 
-export default function LightboxImage({value, alt, width = 2000, height = 1000, className = '', priority = false, sizes}: LightboxImageProps) {
+export default function LightboxImage({
+	value,
+	alt,
+	width = 2000,
+	height = 1000,
+	className = '',
+	priority = false,
+	sizes,
+	galleryIndex,
+}: LightboxImageProps) {
+	const gallery = usePostGallery();
 	const [mounted, setMounted] = useState(false);
 	const [present, setPresent] = useState(false);
 	const [visible, setVisible] = useState(false);
@@ -32,7 +46,7 @@ export default function LightboxImage({value, alt, width = 2000, height = 1000, 
 	}, []);
 
 	useEffect(() => {
-		if (!present) return;
+		if (!present || gallery) return;
 
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') close();
@@ -46,15 +60,7 @@ export default function LightboxImage({value, alt, width = 2000, height = 1000, 
 			document.body.style.overflow = previousOverflow;
 			document.removeEventListener('keydown', onKeyDown);
 		};
-	}, [present]);
-
-	const open = () => {
-		setImageLoaded(false);
-		setPresent(true);
-		requestAnimationFrame(() => {
-			requestAnimationFrame(() => setVisible(true));
-		});
-	};
+	}, [present, gallery]);
 
 	const close = () => {
 		setVisible(false);
@@ -62,6 +68,20 @@ export default function LightboxImage({value, alt, width = 2000, height = 1000, 
 			setPresent(false);
 			setImageLoaded(false);
 		}, FADE_MS);
+	};
+
+	const open = () => {
+		if (gallery && gallery.images.length > 0) {
+			const index = galleryIndex != null && galleryIndex >= 0 ? galleryIndex : findGalleryIndex(gallery.images, value);
+			gallery.openAt(index >= 0 ? index : 0);
+			return;
+		}
+
+		setImageLoaded(false);
+		setPresent(true);
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => setVisible(true));
+		});
 	};
 
 	if (!value) return null;
@@ -75,20 +95,21 @@ export default function LightboxImage({value, alt, width = 2000, height = 1000, 
 				<SanityImage value={value} alt={alt} width={width} height={height} fit="max" priority={priority} sizes={sizes} className="w-full" />
 			</button>
 
-			{mounted && present
+			{/* 無 PostGallery 時的單圖後備 */}
+			{!gallery && mounted && present
 				? createPortal(
 						<div
 							role="dialog"
 							aria-modal="true"
 							aria-label="圖片預覽"
-							className={`fixed inset-0 z-[100] flex items-center justify-center bg-white p-5 transition-opacity duration-300 ease-out md:p-10 ${
+							className={`fixed inset-0 z-[10000] flex items-center justify-center bg-graphite p-5 text-paper transition-opacity duration-300 ease-out md:p-10 ${
 								visible ? 'opacity-100' : 'opacity-0'
 							}`}
 							onClick={close}>
 							<button
 								type="button"
 								aria-label="close"
-								className="absolute top-5 right-5 cursor-pointer text-2xl lowercase tracking-wide text-foreground transition-colors hover:text-primary md:top-8 md:right-10"
+								className="absolute top-5 right-5 cursor-pointer text-2xl lowercase tracking-wide text-paper transition-opacity hover:opacity-70 md:top-8 md:right-10"
 								onClick={close}>
 								close
 							</button>
@@ -113,7 +134,7 @@ export default function LightboxImage({value, alt, width = 2000, height = 1000, 
 										onError={() => setImageLoaded(true)}
 									/>
 								</span>
-								{photoExif ? <p className="max-w-[90vw] text-center text-sm text-gray-500">{photoExif}</p> : null}
+								{photoExif ? <p className="max-w-[90vw] text-center font-grotesk text-sm text-paper/70">{photoExif}</p> : null}
 							</div>
 						</div>,
 						document.body,

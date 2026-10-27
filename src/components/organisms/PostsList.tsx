@@ -13,7 +13,7 @@ export default async function PostsList() {
 	}
 
 	return (
-		<main className="space-y-12">
+		<main className="space-y-20">
 			{posts.map((post: any, index: number) => (
 				<FadeIn key={post._id}>
 					<PostCard post={post} priority={index === 0} />

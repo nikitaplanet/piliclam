@@ -19,20 +19,24 @@ export default function PostCard({post, priority = false}: PostCardProps) {
 		<article>
 			<Link href={`/posts/${post.slug.current}`} className="group block outline-offset-4">
 				{post.mainImage ? (
-					<SanityImage
-						value={post.mainImage}
-						alt={post.title}
-						width={2000}
-						height={1000}
-						fit="max"
-						className="mb-4 w-full"
-						priority={priority}
-						sizes="(max-width: 1000px) 100vw, 1000px"
-					/>
+					<div className="mb-4 transition-[filter,box-shadow] duration-300 group-hover:brightness-110 group-hover:shadow-lg">
+						<SanityImage
+							value={post.mainImage}
+							alt={post.title}
+							width={2000}
+							height={1000}
+							fit="max"
+							className="w-full"
+							priority={priority}
+							sizes="(max-width: 1000px) 100vw, 1000px"
+						/>
+					</div>
 				) : null}
-				<h2 className="text-xl font-semibold group-hover:underline">{post.title}</h2>
-				{post.publishedAt ? <PostDate value={post.publishedAt} /> : null}
-				{post.excerpt ? <p className="mt-2">{post.excerpt}</p> : null}
+				<div className="transition-opacity group-hover:opacity-80">
+					<h2 className="text-xl font-semibold">{post.title}</h2>
+					{post.publishedAt ? <PostDate value={post.publishedAt} className="text-base text-gray-500" /> : null}
+					{post.excerpt ? <p className="mt-2">{post.excerpt}</p> : null}
+				</div>
 			</Link>
 		</article>
 	);
