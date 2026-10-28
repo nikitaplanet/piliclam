@@ -6,7 +6,12 @@ export default function LifePage() {
 	return (
 		<PageFadeIn>
 			<ContentShell>
-				<PostsList />
+				<main>
+					<h1 className="text-5xl font-semibold lowercase text-center">Life</h1>
+					<div className="mt-10">
+						<PostsList />
+					</div>
+				</main>
 			</ContentShell>
 		</PageFadeIn>
 	);

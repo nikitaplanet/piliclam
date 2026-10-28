@@ -6,8 +6,8 @@ export default function WorksPage() {
 		<PageFadeIn>
 			<ContentShell>
 				<main>
-					<h1 className="text-2xl font-semibold lowercase">works</h1>
-					<p className="mt-4 text-gray-500">即將推出</p>
+					<h1 className="text-5xl font-semibold lowercase text-center">Works</h1>
+					<p className="mt-10 text-center text-gray-500">即將推出</p>
 				</main>
 			</ContentShell>
 		</PageFadeIn>

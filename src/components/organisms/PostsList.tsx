@@ -12,10 +12,10 @@ export default async function PostsList() {
 	}
 
 	return (
-		<main className="space-y-20">
+		<div className="space-y-20">
 			{posts.map((post: any, index: number) => (
 				<PostCard key={post._id} post={post} priority={index === 0} />
 			))}
-		</main>
+		</div>
 	);
 }
