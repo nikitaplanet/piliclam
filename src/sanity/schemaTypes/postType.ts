@@ -1,4 +1,4 @@
-import {defineField, defineType, type ImageMetadataType} from 'sanity';
+import {defineArrayMember, defineField, defineType, type ImageMetadataType} from 'sanity';
 import {WidePortableTextInput} from '../components/WidePortableTextInput';
 
 const imageMetadataOptions = {
@@ -6,11 +6,28 @@ const imageMetadataOptions = {
 	metadata: ['exif', 'image', 'lqip', 'palette', 'blurhash'] satisfies ImageMetadataType[],
 };
 
+const isGallery = (document: unknown) =>
+	Boolean(document && typeof document === 'object' && 'entryType' in document && document.entryType === 'gallery');
+
 export const postType = defineType({
 	name: 'post',
-	title: '文章',
+	title: 'Life',
 	type: 'document',
 	fields: [
+		defineField({
+			name: 'entryType',
+			title: '類型',
+			type: 'string',
+			options: {
+				list: [
+					{title: '部落格', value: 'blog'},
+					{title: '藝廊', value: 'gallery'},
+					// 預留未來擴充：例如 journal、notes 等
+				],
+				layout: 'radio',
+			},
+			initialValue: 'blog',
+		}),
 		defineField({
 			name: 'title',
 			title: '標題',
@@ -52,6 +69,7 @@ export const postType = defineType({
 			name: 'body',
 			title: '內文',
 			type: 'array',
+			hidden: ({document}) => isGallery(document),
 			components: {
 				input: WidePortableTextInput,
 			},
@@ -70,5 +88,47 @@ export const postType = defineType({
 				},
 			],
 		}),
+		defineField({
+			name: 'galleryImages',
+			title: '藝廊圖片',
+			type: 'array',
+			description: '可上傳多張圖片，每張可加附註',
+			hidden: ({document}) => !isGallery(document),
+			of: [
+				defineArrayMember({
+					type: 'image',
+					options: {...imageMetadataOptions},
+					fields: [
+						defineField({
+							name: 'alt',
+							title: '替代文字',
+							type: 'string',
+						}),
+						defineField({
+							name: 'caption',
+							title: '附註',
+							type: 'string',
+						}),
+					],
+				}),
+			],
+		}),
 	],
+	preview: {
+		select: {
+			title: 'title',
+			entryType: 'entryType',
+			media: 'mainImage',
+			publishedAt: 'publishedAt',
+		},
+		prepare({title, entryType, media, publishedAt}) {
+			const typeLabel = entryType === 'gallery' ? '藝廊' : '部落格';
+			const date = publishedAt ? new Date(publishedAt).toLocaleDateString('zh-TW') : '';
+			return {
+				title: title || '未命名',
+				subtitle: [typeLabel, date].filter(Boolean).join(' · '),
+				media,
+			};
+		},
+	},
 });

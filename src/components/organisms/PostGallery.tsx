@@ -278,6 +278,9 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 											onError={onImageReady}
 										/>
 									</span>
+									{current.caption ? (
+										<p className="max-w-[90vw] text-center font-grotesk text-sm text-paper/80">{current.caption}</p>
+									) : null}
 									{photoExif ? <p className="max-w-[90vw] text-center font-grotesk text-sm text-paper/70">{photoExif}</p> : null}
 								</div>
 							</div>

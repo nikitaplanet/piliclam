@@ -22,7 +22,24 @@ export default defineConfig({
 	basePath: '/studio',
 	projectId,
 	dataset,
-	schema,
+	schema: {
+		...schema,
+		templates: (prev) => [
+			...prev.filter((template) => template.schemaType !== 'post'),
+			{
+				id: 'post-blog',
+				title: '部落格',
+				schemaType: 'post',
+				value: {entryType: 'blog'},
+			},
+			{
+				id: 'post-gallery',
+				title: '藝廊',
+				schemaType: 'post',
+				value: {entryType: 'gallery'},
+			},
+		],
+	},
 	theme: studioTheme,
 	studio: {
 		components: {

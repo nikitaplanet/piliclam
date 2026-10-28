@@ -4,7 +4,8 @@ import BackLink from '@/components/atoms/BackLink';
 import PostDate from '@/components/atoms/PostDate';
 import LightboxImage from '@/components/molecules/LightboxImage';
 import PostGallery from '@/components/organisms/PostGallery';
-import {collectPostGalleryImages, findGalleryIndex} from '@/lib/postGallery';
+import {lifeListHref, resolveEntryType} from '@/lib/lifeEntry';
+import {collectGalleryEntryImages, collectPostGalleryImages, findGalleryIndex} from '@/lib/postGallery';
 import {client} from '@/sanity/lib/client';
 import {hasImageAsset} from '@/sanity/lib/image';
 import {POST_QUERY} from '@/sanity/lib/queries';
@@ -16,6 +17,44 @@ const options = {next: {revalidate: 60}};
 export default async function PostContent({slug}: {slug: string}) {
 	const post = await client.fetch(POST_QUERY, {slug}, options);
 	if (!post) notFound();
+
+	const entryType = resolveEntryType(post.entryType);
+	const backHref = lifeListHref(entryType);
+
+	if (entryType === 'gallery') {
+		const images = collectGalleryEntryImages(post);
+
+		return (
+			<PostGallery images={images}>
+				<article>
+					<BackLink href={backHref} className="mb-6" />
+					<h1 className="mb-2 text-3xl font-bold">{post.title}</h1>
+					{post.publishedAt ? <PostDate value={post.publishedAt} className="text-lg text-gray-500" /> : null}
+					{post.excerpt ? <p className="mt-4 text-lg text-gray-700">{post.excerpt}</p> : null}
+					{images.length > 0 ? (
+						<ul className="mt-10 space-y-12">
+							{images.map((image, index) => (
+								<li key={image.key || String(index)}>
+									<LightboxImage
+										value={image.value}
+										alt={image.alt}
+										width={2000}
+										height={1500}
+										sizes="(max-width: 1000px) 100vw, 1000px"
+										galleryIndex={index}
+										priority={index === 0}
+									/>
+									{image.caption ? <p className="mt-3 text-base text-gray-600">{image.caption}</p> : null}
+								</li>
+							))}
+						</ul>
+					) : (
+						<p className="mt-10 text-gray-500">尚無圖片</p>
+					)}
+				</article>
+			</PostGallery>
+		);
+	}
 
 	const images = collectPostGalleryImages(post);
 
@@ -42,7 +81,7 @@ export default async function PostContent({slug}: {slug: string}) {
 	return (
 		<PostGallery images={images}>
 			<article>
-				<BackLink className="mb-6" />
+				<BackLink href={backHref} className="mb-6" />
 				<h1 className="mb-2 text-3xl font-bold">{post.title}</h1>
 				{post.publishedAt ? <PostDate value={post.publishedAt} className="text-lg text-gray-500" /> : null}
 				{hasImageAsset(post.mainImage) ? (
