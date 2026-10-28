@@ -14,19 +14,25 @@ export default async function LifePage({searchParams}: Props) {
 
 	return (
 		<PageFadeIn>
-			<ContentShell>
-				<main>
-					<h1 className="text-center text-5xl font-semibold lowercase">Life</h1>
-					<div className="mt-10 flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
-						<aside className="shrink-0 md:sticky md:top-[calc(3.5rem+50px)] md:w-28">
-							<LifeTypeTabs active={entryType} />
-						</aside>
-						<div className="min-w-0 flex-1">
-							<PostsList entryType={entryType} />
-						</div>
+			<main>
+				{/* 桌面：對齊 navbar 左側間距（px-5 / md:px-10），不擠動內容區 */}
+				<aside className="pointer-events-none fixed top-[calc(3.5rem+50px)] left-0 z-10 hidden px-5 md:pointer-events-auto md:block md:px-10">
+					<div className="pointer-events-auto pt-2">
+						<LifeTypeTabs active={entryType} />
 					</div>
-				</main>
-			</ContentShell>
+				</aside>
+
+				<ContentShell>
+					<h1 className="text-center text-5xl font-semibold lowercase">Life</h1>
+					{/* 手機：維持標題下方橫向 tabs */}
+					<div className="mt-10 md:hidden">
+						<LifeTypeTabs active={entryType} />
+					</div>
+					<div className="mt-10">
+						<PostsList entryType={entryType} />
+					</div>
+				</ContentShell>
+			</main>
 		</PageFadeIn>
 	);
 }

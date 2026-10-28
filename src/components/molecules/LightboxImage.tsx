@@ -12,7 +12,7 @@ import {hasImageAsset, urlFor} from '@/sanity/lib/image';
 import type {SanityImageSource} from '@sanity/image-url';
 
 const FADE_MS = 300;
-/** 首次開啟至少顯示一輪長條 shimmer */
+/** 首次開啟至少顯示一輪 UFO 飛行 */
 const LOADER_CYCLE_MS = 1500;
 
 type LightboxImageProps = {
@@ -147,10 +147,10 @@ export default function LightboxImage({
 								onClick={close}>
 								close
 							</button>
-							{!showImage ? <BarLoading className="absolute inset-0 z-[1]" /> : null}
+							{!showImage ? <BarLoading className="absolute inset-0 z-[5]" /> : null}
 							<div
 								className="relative z-[2] flex max-h-[90dvh] w-full max-w-full flex-col items-center justify-center gap-4 transition-opacity duration-500 ease-out"
-								style={{opacity: showImage ? 1 : 0}}
+								style={{opacity: showImage ? 1 : 0, visibility: showImage ? 'visible' : 'hidden'}}
 								aria-hidden={!showImage}
 								onClick={(event) => event.stopPropagation()}>
 								<span className="relative flex max-h-[min(90dvh,calc(90dvh-3rem))] max-w-full items-center justify-center">

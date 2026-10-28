@@ -101,16 +101,31 @@ body {
 	animation: image-skeleton-shimmer 1.4s ease-in-out infinite;
 }
 
-.bar-loading {
-	background-color: rgb(255 255 255 / 0.35);
-	background-image: linear-gradient(90deg, transparent 0%, rgb(255 255 255 / 0.95) 50%, transparent 100%);
-	background-size: 200% 100%;
-	animation: image-skeleton-shimmer 2.2s ease-in-out infinite;
+/* UFO：由左上飛到右下；一輪 1.5s 對齊首次 lightbox loader */
+@keyframes bar-loading-ufo-fly {
+	from {
+		/* 起點再往內縮約半個圖寬 */
+		top: 1.5rem;
+		left: 1.5rem;
+	}
+	to {
+		/* 終點內縮約圖檔寬高（size-12 = 3rem） */
+		top: calc(100% - 3rem);
+		left: calc(100% - 3rem);
+	}
+}
+
+.bar-loading-ufo {
+	animation: bar-loading-ufo-fly 1.5s linear infinite;
+	will-change: top, left;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.image-skeleton,
-	.bar-loading {
+	.image-skeleton {
 		animation: none;
+	}
+
+	.bar-loading-ufo {
+		animation: bar-loading-ufo-fly 2.4s linear infinite;
 	}
 }

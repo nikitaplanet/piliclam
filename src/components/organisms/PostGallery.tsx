@@ -11,7 +11,7 @@ import {hasImageAsset, urlFor} from '@/sanity/lib/image';
 
 const FADE_MS = 300;
 const SLIDE_FADE_MS = 360;
-/** 首次開啟 lightbox 至少顯示一輪長條 shimmer */
+/** 首次開啟 lightbox 至少顯示一輪 UFO 飛行 */
 const LOADER_CYCLE_MS = 1500;
 const LOADER_SLIDE_MS = 160;
 const SWIPE_THRESHOLD_PX = 48;
@@ -227,7 +227,7 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 								<button
 									type="button"
 									aria-label="上一張"
-									className="absolute top-1/2 left-1 z-10 hidden min-h-12 min-w-12 -translate-y-1/2 cursor-pointer touch-manipulation px-2 text-3xl text-paper transition-opacity hover:opacity-70 md:left-8 md:flex md:items-center md:justify-center"
+									className="absolute top-1/2 left-0 z-10 hidden h-40 w-20 -translate-y-1/2 cursor-pointer touch-manipulation items-center justify-center text-3xl text-paper transition-opacity hover:opacity-70 md:left-4 md:flex"
 									onClick={(event) => {
 										event.stopPropagation();
 										goRelative(-1);
@@ -241,7 +241,7 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 								<button
 									type="button"
 									aria-label="下一張"
-									className="absolute top-1/2 right-1 z-10 hidden min-h-12 min-w-12 -translate-y-1/2 cursor-pointer touch-manipulation px-2 text-3xl text-paper transition-opacity hover:opacity-70 md:right-8 md:flex md:items-center md:justify-center"
+									className="absolute top-1/2 right-0 z-10 hidden h-40 w-20 -translate-y-1/2 cursor-pointer touch-manipulation items-center justify-center text-3xl text-paper transition-opacity hover:opacity-70 md:right-4 md:flex"
 									onClick={(event) => {
 										event.stopPropagation();
 										goRelative(1);
@@ -251,7 +251,7 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 								</button>
 							) : null}
 
-							{showBarLoader ? <BarLoading className="absolute inset-0 z-[1]" /> : null}
+							{showBarLoader ? <BarLoading className="absolute inset-0 z-[5]" /> : null}
 							<div
 								className="relative z-[2] flex max-h-[90dvh] w-full max-w-full touch-pan-y flex-col items-center gap-4 select-none"
 								aria-hidden={!imageLoaded}
@@ -261,6 +261,7 @@ export default function PostGallery({images, children}: PostGalleryProps) {
 									style={{
 										opacity: slideVisible ? 1 : 0,
 										transitionDuration: `${SLIDE_FADE_MS}ms`,
+										visibility: slideVisible || imageLoaded ? 'visible' : 'hidden',
 									}}>
 									<span className="relative flex max-h-[min(90dvh,calc(90dvh-5rem))] max-w-full items-center justify-center">
 										{/* 背景先載圖，首次開啟等飛碟播完一輪再淡入 */}
