@@ -32,7 +32,7 @@ export default function SanityImage({
 	sizes,
 	fill = false,
 	fit,
-	quality = 90,
+	quality = 100,
 }: SanityImageProps) {
 	const valid = hasImageAsset(value);
 	const resolvedFit = fit ?? (fill ? 'crop' : undefined);
