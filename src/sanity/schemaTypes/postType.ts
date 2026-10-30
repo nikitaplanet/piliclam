@@ -58,6 +58,12 @@ export const postType = defineType({
 					type: 'string',
 				}),
 			],
+			validation: (rule) =>
+				rule.custom((value, context) => {
+					if (!isGallery(context.document)) return true;
+					const asset = value && typeof value === 'object' && 'asset' in value ? value.asset : undefined;
+					return asset ? true : '藝廊封面為必填';
+				}),
 		}),
 		defineField({
 			name: 'excerpt',
